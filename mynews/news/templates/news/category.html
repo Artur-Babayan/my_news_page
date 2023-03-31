@@ -1,0 +1,60 @@
+{% extends 'news/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <h3>Categories</h3>
+        <ul class="list-group">
+            {% for category in categories %}
+                <a href="{% url 'category' category.pk %}" class="list-group-item{% if category == selected_category %} active{% endif %}">{{ category.name }}</a>
+            {% endfor %}
+        </ul>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Add Category</button>
+        </form>
+    </div>
+    <div class="col-md-9">
+        <h3>{{ selected_category.name }}</h3>
+        <hr>
+        {% for article in articles %}
+            <h4><a href="{% url 'news_detail' article.pk %}">{{ article.title }}</a></h4>
+            <p>
+                {% for category in article.categories.all %}
+                    {% if category.is_main_category %}
+                        <span class="main-category">{{ category.name }}</span>
+                    {% else %}
+                        <span class="category">{{ category.name }}</span>
+                    {% endif %}
+                {% endfor %}
+            </p>
+            <p>{{ article.created_date }}</p>
+            <hr>
+        {% empty %}
+            <p>No articles found.</p>
+        {% endfor %}
+        {% if articles.has_other_pages %}
+            <nav>
+                {% if articles.has_previous %}
+                    <a href="?page=1">&laquo; First</a>
+                    <a href="?page={{ articles.previous_page_number }}">Previous</a>
+                {% endif %}
+
+                {% for i in articles.paginator.page_range %}
+                    {% if articles.number == i %}
+                        <span class="current-page">{{ i }}</span>
+                    {% elif i > articles.number|add:'-3' and i < articles.number|add:'3' %}
+                        <a href="?page={{ i }}">{{ i }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if articles.has_next %}
+                    <a href="?page={{ articles.next_page_number }}">Next</a>
+                    <a href="?page={{ articles.paginator.num_pages }}">Last &raquo;</a>
+                {% endif %}
+            </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

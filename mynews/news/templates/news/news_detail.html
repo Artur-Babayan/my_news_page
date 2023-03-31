@@ -1,0 +1,16 @@
+{% extends 'news/base.html' %}
+
+{% block content %}
+<h1>{{ article.title }}</h1>
+<p>
+    {% for category in article.categories.all %}
+        {% if category.is_main_category %}
+            <span class="main-category">{{ category.name }}</span>
+        {% else %}
+            <span class="category">{{ category.name }}</span>
+        {% endif %}
+    {% endfor %}
+</p>
+<p>{{ article.created_date }}</p>
+<div>{{ article.content }}</div>
+{% endblock %}
